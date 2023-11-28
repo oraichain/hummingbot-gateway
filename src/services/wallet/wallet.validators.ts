@@ -62,7 +62,7 @@ export const isTezosPrivateKey = (str: string): boolean => {
   } catch {
     return false;
   }
-}
+};
 
 // given a request, look for a key called privateKey that is an Ethereum private key
 export const validatePrivateKey: Validator = mkSelectingValidator(
@@ -104,6 +104,11 @@ export const validatePrivateKey: Validator = mkSelectingValidator(
       invalidCosmosPrivateKeyError,
       (val) => typeof val === 'string' && isCosmosPrivateKey(val)
     ),
+    aura: mkValidator(
+      'privateKey',
+      invalidCosmosPrivateKeyError,
+      (val) => typeof val === 'string' && isCosmosPrivateKey(val)
+    ),
     polygon: mkValidator(
       'privateKey',
       invalidEthPrivateKeyError,
@@ -138,7 +143,7 @@ export const validatePrivateKey: Validator = mkSelectingValidator(
 );
 
 export const invalidChainError: string =
-  'chain must be "ethereum", "avalanche", "near", "harmony", "cosmos", "binance-smart-chain", "injective", or "kujira"';
+  'chain must be "ethereum", "avalanche", "near", "harmony", "cosmos", "aura", "binance-smart-chain", "injective", or "kujira"';
 
 export const invalidNetworkError: string =
   'expected a string for the network key';
@@ -167,7 +172,8 @@ export const validateChain: Validator = mkValidator(
       val === 'binance-smart-chain' ||
       val === 'injective' ||
       val === 'tezos' ||
-      val === 'kujira')
+      val === 'kujira' ||
+      val === 'aura')
 );
 
 export const validateNetwork: Validator = mkValidator(

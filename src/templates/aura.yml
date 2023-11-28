@@ -1,0 +1,16 @@
+networks:
+  xstaxy:
+    nodeURL: https://rpc.aura.network
+    tokenListType: FILE
+    tokenListSource: /home/tuan1998/gateway/conf/lists/aura_xstaxy.json
+    routerAddress: aura10lfagekpspw59za99x98tuxfsegx3v5sxycntqnfd4vj7e6xzq0skguqty
+    defaultGasPrice: 1uaura
+  euphoria:
+    nodeURL: https://rpc.euphoria.aura.network
+    tokenListType: FILE
+    tokenListSource: /home/tuan1998/gateway/conf/lists/aura_euphoria.json
+    routerAddress: aura1qa6ulm3jzlm9kzln63rmkn50xm7xmchkddvmkaj7cg0lk63tprsqalwtcj
+    defaultGasPrice: 1ueaura
+network: euphoria
+nativeCurrencySymbol: AURA
+manualGasPrice: 110

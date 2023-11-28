@@ -34,6 +34,7 @@ import {
 } from '../connection-manager';
 import { Ethereumish, Tezosish } from '../common-interfaces';
 import { Algorand } from '../../chains/algorand/algorand';
+import { Aura } from '../../chains/aura/aura';
 
 export function convertXdcAddressToEthAddress(publicKey: string): string {
   return publicKey.length === 43 && publicKey.slice(0, 3) === 'xdc'
@@ -112,6 +113,16 @@ export async function addWallet(
         req.privateKey,
         passphrase
       );
+    } else if (connection instanceof Aura) {
+      const wallet = await (connection as Aura).getAccountsfromPrivateKey(
+        req.privateKey,
+        'aura'
+      );
+      address = wallet.address;
+      encryptedPrivateKey = await (connection as Aura).encrypt(
+        req.privateKey,
+        passphrase
+      );
     } else if (connection instanceof Near) {
       address = (
         await connection.getWalletFromPrivateKey(
@@ -184,7 +195,11 @@ export async function signMessage(
   if (req.chain === 'tezos') {
     const chain: Tezosish = await getInitializedChain(req.chain, req.network);
     const wallet = await chain.getWallet(req.address);
-    return { signature: (await wallet.signer.sign("0x03" + req.message)).sbytes.slice(4) };
+    return {
+      signature: (await wallet.signer.sign('0x03' + req.message)).sbytes.slice(
+        4
+      ),
+    };
   } else {
     const chain: Ethereumish = await getInitializedChain(
       req.chain,

@@ -1,0 +1,36 @@
+{
+  "tokens": [
+    {
+      "name": "Nois",
+      "type": "ibc",
+      "decimals": 6,
+      "description": "Nois",
+      "coinDenom": "NOIS",
+      "minCoinDenom": "",
+      "cosmosDenom": "ibc/1FD48481DAA1B05575FE6D3E35929264437B8424A73243B207BCB67401C7F1FD",
+      "channel": "channel-2",
+      "icon": "https://aura-explorer-assets.s3.ap-southeast-1.amazonaws.com/dev-assets/token/White.svg"
+    },
+    {
+      "name": "Tether USDt",
+      "type": "ibc",
+      "decimals": 6,
+      "description": "Tether USDt",
+      "coinDenom": "USDT",
+      "minCoinDenom": "",
+      "cosmosDenom": "ibc/A95EBDF88AC1E3FDECAA1D6E250B07C0C86475A3E2BFA2E7DC94A6CDE23DF6D6",
+      "channel": "channel-2",
+      "icon": "https://assets.coingecko.com/coins/images/325/large/Tether.png"
+    },
+    {
+      "name": "USDC",
+      "type": "cw20",
+      "decimals": 18,
+      "description": "USDC coin",
+      "coinDenom": "USDC",
+      "minCoinDenom": "",
+      "address": "aura1fgfnuru6krewgt9zzu7nzercz007928uzrw2t2tl6hl3ec50me2q3ankr2",
+      "icon": "https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+    }
+  ]
+}

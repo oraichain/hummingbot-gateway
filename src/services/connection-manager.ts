@@ -42,6 +42,8 @@ import { Tinyman } from '../connectors/tinyman/tinyman';
 import { Plenty } from '../connectors/plenty/plenty';
 import { Kujira } from '../chains/kujira/kujira';
 import { KujiraCLOB } from '../connectors/kujira/kujira';
+import { Aura } from '../chains/aura/aura';
+import { Halotrade } from '../connectors/halotrade/halotrade';
 
 export type ChainUnion =
   | Algorand
@@ -51,7 +53,8 @@ export type ChainUnion =
   | Injective
   | Xdcish
   | Tezosish
-  | Kujira;
+  | Kujira
+  | Aura;
 
 export type Chain<T> = T extends Algorand
   ? Algorand
@@ -120,6 +123,8 @@ export async function getChainInstance(
     connection = Cronos.getInstance(network);
   } else if (chain === 'cosmos') {
     connection = Cosmos.getInstance(network);
+  } else if (chain === 'aura') {
+    connection = Aura.getInstance(network);
   } else if (chain === 'near') {
     connection = Near.getInstance(network);
   } else if (chain === 'binance-smart-chain') {
@@ -148,7 +153,8 @@ export type ConnectorUnion =
   | InjectiveClobPerp
   | Tinyman
   | Plenty
-  | KujiraCLOB;
+  | KujiraCLOB
+  | Halotrade;
 
 export type Connector<T> = T extends Uniswapish
   ? Uniswapish
@@ -168,6 +174,8 @@ export type Connector<T> = T extends Uniswapish
   ? Plenty
   : T extends KujiraCLOB
   ? KujiraCLOB
+  : T extends Halotrade
+  ? Halotrade
   : never;
 
 export async function getConnector<T>(
@@ -224,6 +232,8 @@ export async function getConnector<T>(
     connectorInstance = Plenty.getInstance(network);
   } else if (chain === 'kujira' && connector === 'kujira') {
     connectorInstance = KujiraCLOB.getInstance(chain, network);
+  } else if (chain === 'aura' && connector === 'halotrade') {
+    connectorInstance = Halotrade.getInstance(chain, network);
   } else {
     throw new Error('unsupported chain or connector');
   }

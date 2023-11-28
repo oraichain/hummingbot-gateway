@@ -109,6 +109,8 @@ import {
 } from '../clob/clob.requests';
 import { BalanceRequest } from '../network/network.requests';
 import { TradeV2 } from '@traderjoe-xyz/sdk-v2';
+import { AuraToken } from '../chains/aura/aura-token';
+import { AuraBase } from '../chains/aura/aura-base';
 
 // TODO Check the possibility to have clob/solana/serum equivalents here
 //  Check this link https://hummingbot.org/developers/gateway/building-gateway-connectors/#5-add-sdk-classes-to-uniswapish-interface
@@ -123,7 +125,8 @@ export type Tokenish =
   | PancakeSwapToken
   | MMFToken
   | VVSToken
-  | TokenXsswap;
+  | TokenXsswap
+  | AuraToken;
 
 export type TokenAmountish = MMFTokenAmount | VVSTokenAmount;
 
@@ -393,6 +396,102 @@ export interface RefAMMish {
     tokenOut: TokenMetadata,
     allowedSlippage?: string
   ): Promise<FinalExecutionOutcome>;
+}
+
+export interface Halotradish {
+  /**
+   * Router address.
+   */
+  router: string;
+
+  /**
+   * Default gas estiamte for swap transactions.
+   */
+  gasLimitEstimate: number;
+
+  /**
+   * Default time-to-live for swap transactions, in seconds.
+   */
+  ttl: number;
+
+  init(): Promise<void>;
+
+  ready(): boolean;
+
+  // balances?(req: BalanceRequest): Promise<Record<string, string>>;
+
+  /**
+   * Given a token's address, return the connector's native representation of
+   * the token.
+   *
+   * @param address Token address
+   */
+  getTokenByAddress(address: string): TokenMetadata;
+
+  /**
+   * Calculated expected execution price and expected amount in after a swap/trade
+   * @param trades The trade path object
+   */
+  // parseTrade(
+  //   trades: EstimateSwapView[],
+  //   side: string
+  // ): {
+  //   estimatedPrice: string;
+  //   expectedAmount: string;
+  // };
+
+  /**
+   * Given the amount of `baseToken` to put into a transaction, calculate the
+   * amount of `quoteToken` that can be expected from the transaction.
+   *
+   * This is typically used for calculating token sell prices.
+   *
+   * @param baseToken Token input for the transaction
+   * @param quoteToken Output from the transaction
+   * @param amount Amount of `baseToken` to put into the transaction
+   */
+  estimateSellTrade(
+    baseToken: TokenMetadata,
+    quoteToken: TokenMetadata,
+    amount: string,
+    allowedSlippage?: string
+  ): void;
+
+  /**
+   * Given the amount of `baseToken` desired to acquire from a transaction,
+   * calculate the amount of `quoteToken` needed for the transaction.
+   *
+   * This is typically used for calculating token buy prices.
+   *
+   * @param quoteToken Token input for the transaction
+   * @param baseToken Token output from the transaction
+   * @param amount Amount of `baseToken` desired from the transaction
+   */
+  // estimateBuyTrade(
+  //   quoteToken: TokenMetadata,
+  //   baseToken: TokenMetadata,
+  //   amount: string,
+  //   allowedSlippage?: string
+  // ): Promise<{ trade: EstimateSwapView[]; expectedAmount: string }>;
+
+  // /**
+  //  * Given an Account and a Ref trade, try to execute it on blockchain.
+  //  *
+  //  * @param account Account
+  //  * @param trade Expected trade
+  //  * @param amountIn Amount to swap in
+  //  * @param tokenIn Token to be sent
+  //  * @param tokenOut Token to be received
+  //  * @param allowedSlippage Maximum allowable slippage
+  //  */
+  // executeTrade(
+  //   account: Account,
+  //   trade: EstimateSwapView[],
+  //   amountIn: string,
+  //   tokenIn: TokenMetadata,
+  //   tokenOut: TokenMetadata,
+  //   allowedSlippage?: string
+  // ): Promise<FinalExecutionOutcome>;
 }
 
 export interface UniswapLPish {
@@ -710,6 +809,12 @@ export interface Nearish extends BasicChainMethods, NearBase {
 }
 
 export interface Cosmosish extends CosmosBase {
+  gasPrice: number;
+  nativeTokenSymbol: string;
+  chain: string;
+}
+
+export interface Auraish extends AuraBase {
   gasPrice: number;
   nativeTokenSymbol: string;
   chain: string;

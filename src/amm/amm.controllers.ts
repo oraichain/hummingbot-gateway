@@ -58,7 +58,15 @@ import {
   trade as plentyTrade,
   estimateGas as plentyEstimateGas,
 } from '../connectors/plenty/plenty.controllers';
-import { getInitializedChain, getConnector } from '../services/connection-manager';
+import {
+  price as halotradePrice,
+  trade as halotradeTrade,
+  // estimateGas as halotradeEstimateGas,
+} from '../connectors/halotrade/halotrade.controllers';
+import {
+  getInitializedChain,
+  getConnector,
+} from '../services/connection-manager';
 import {
   Chain as Ethereumish,
   Nearish,
@@ -72,15 +80,19 @@ import {
 import { Algorand } from '../chains/algorand/algorand';
 import { Tinyman } from '../connectors/tinyman/tinyman';
 import { Plenty } from '../connectors/plenty/plenty';
+import { Halotrade } from '../connectors/halotrade/halotrade';
+import { Aura } from '../chains/aura/aura';
 
 export async function price(req: PriceRequest): Promise<PriceResponse> {
-  const chain = await getInitializedChain<Algorand | Ethereumish | Nearish | Tezosish>(
-    req.chain,
-    req.network
-  );
-  const connector: Uniswapish | RefAMMish | Tinyman | Plenty = await getConnector<
-    Uniswapish | RefAMMish | Tinyman | Plenty
-  >(req.chain, req.network, req.connector);
+  const chain = await getInitializedChain<
+    Algorand | Ethereumish | Nearish | Tezosish
+  >(req.chain, req.network);
+  const connector: Uniswapish | RefAMMish | Tinyman | Plenty | Halotrade =
+    await getConnector<Uniswapish | RefAMMish | Tinyman | Plenty | Halotrade>(
+      req.chain,
+      req.network,
+      req.connector
+    );
 
   if (connector instanceof Plenty) {
     return plentyPrice(<Tezosish>chain, connector, req);
@@ -89,19 +101,23 @@ export async function price(req: PriceRequest): Promise<PriceResponse> {
     return uniswapPrice(<Ethereumish>chain, connector, req);
   } else if (connector instanceof Tinyman) {
     return tinymanPrice(chain as unknown as Algorand, connector, req);
+  } else if (connector instanceof Halotrade) {
+    return halotradePrice(chain as unknown as Aura, connector, req);
   } else {
     return refPrice(<Nearish>chain, connector as RefAMMish, req);
   }
 }
 
 export async function trade(req: TradeRequest): Promise<TradeResponse> {
-  const chain = await getInitializedChain<Algorand | Ethereumish | Nearish | Tezosish>(
-    req.chain,
-    req.network
-  );
-  const connector: Uniswapish | RefAMMish | Tinyman | Plenty = await getConnector<
-    Uniswapish | RefAMMish | Tinyman | Plenty
-  >(req.chain, req.network, req.connector);
+  const chain = await getInitializedChain<
+    Algorand | Ethereumish | Nearish | Tezosish
+  >(req.chain, req.network);
+  const connector: Uniswapish | RefAMMish | Tinyman | Plenty =
+    await getConnector<Uniswapish | RefAMMish | Tinyman | Plenty>(
+      req.chain,
+      req.network,
+      req.connector
+    );
 
   if (connector instanceof Plenty) {
     return plentyTrade(<Tezosish>chain, connector, req);
@@ -110,6 +126,8 @@ export async function trade(req: TradeRequest): Promise<TradeResponse> {
     return uniswapTrade(<Ethereumish>chain, connector, req);
   } else if (connector instanceof Tinyman) {
     return tinymanTrade(chain as unknown as Algorand, connector, req);
+  } else if (connector instanceof Halotrade) {
+    return halotradeTrade(connector, req);
   } else {
     return refTrade(<Nearish>chain, connector as RefAMMish, req);
   }
@@ -180,13 +198,15 @@ export async function poolPrice(
 export async function estimateGas(
   req: NetworkSelectionRequest
 ): Promise<EstimateGasResponse> {
-  const chain = await getInitializedChain<Algorand | Ethereumish | Nearish | Tezosish>(
-    req.chain,
-    req.network
-  );
-  const connector: Uniswapish | RefAMMish | Tinyman | Plenty = await getConnector<
-    Uniswapish | RefAMMish | Plenty
-  >(req.chain, req.network, req.connector);
+  const chain = await getInitializedChain<
+    Algorand | Ethereumish | Nearish | Tezosish
+  >(req.chain, req.network);
+  const connector: Uniswapish | RefAMMish | Tinyman | Plenty =
+    await getConnector<Uniswapish | RefAMMish | Plenty>(
+      req.chain,
+      req.network,
+      req.connector
+    );
 
   if (connector instanceof Plenty) {
     return plentyEstimateGas(<Tezosish>chain, connector);
