@@ -265,11 +265,11 @@ export class Halotrade {
       }
     });
     const expectedPrice =
-      req.side === 'BUY'
+      req.side === 'SELL'
         ? Number(amountBaseToken) / Number(amountQuoteToken)
         : Number(amountQuoteToken) / Number(amountBaseToken);
     const expectedAmount =
-      req.side === 'BUY'
+      req.side === 'SELL'
         ? Number(req.amount)
         : expectedPrice * Number(req.amount);
     return { expectedAmount, expectedPrice };

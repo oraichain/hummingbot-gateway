@@ -33,7 +33,7 @@
   ], 
   "pools": [
     {
-      "name": "SFTY-AURA",
+      "name": "SFTY-EAURA",
       "asset1Address": "aura1svdtvvut8q9w60d9cvw8gzr22vae28z3dpupzj5hnzhwmf5qfhcq69mgz8",
       "asset2Address": "ueaura",
       "address": "aura13wqxjy4rvgcu053r6cvwl4jgwelqxq6ze9tsk8ymlwdmv0hwgmnqjve0tn"
