@@ -5,17 +5,26 @@ import NodeCache from 'node-cache';
 import fse from 'fs-extra';
 import { ConfigManagerCertPassphrase } from '../../services/config-manager-cert-passphrase';
 import { BigNumber } from 'ethers';
-import { AccountData, DirectSignResponse } from '@cosmjs/proto-signing';
 
-import { IndexedTx, setupIbcExtension } from '@cosmjs/stargate';
 // import { Tokenish } from '../../services/common-interfaces';
 import { AuraPool, AuraToken } from './aura-token';
 // import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 // import { StargateClient } from '@cosmjs/stargate';
 //Cosmos
-const { SigningCosmWasmClient } = require('@cosmjs/cosmwasm-stargate');
-const { DirectSecp256k1Wallet } = require('@cosmjs/proto-signing');
-const { StargateClient } = require('@cosmjs/stargate');
+// const { SigningCosmWasmClient } = require('@cosmjs/cosmwasm-stargate');
+// const { DirectSecp256k1Wallet } = require('@cosmjs/proto-signing');
+// const { StargateClient } = require('@cosmjs/stargate');
+import { SigningCosmWasmClient } from 'cosmjs-cosmwasm-stargate-0.32';
+import {
+  StargateClient,
+  IndexedTx,
+  // setupIbcExtension,
+} from 'cosmjs-stargate-0.32';
+import {
+  DirectSecp256k1Wallet,
+  AccountData,
+  DirectSignResponse,
+} from 'cosmjs-proto-signing-0.32';
 const { toBase64, fromBase64 } = require('@cosmjs/encoding');
 const crypto = require('crypto').webcrypto;
 // export interface AuraToken {
@@ -32,7 +41,7 @@ export interface CosmosWallet {
   prefix: 'string';
   getAccounts(): [AccountData];
   signDirect(): DirectSignResponse;
-  fromKey(): CosmosWallet;
+  // fromKey(): CosmosWallet;
 }
 
 export interface KeyAlgorithm {
@@ -175,12 +184,12 @@ export class AuraBase {
   async getWalletFromPrivateKey(
     privateKey: string,
     prefix: string
-  ): Promise<CosmosWallet> {
+  ): Promise<any> {
     const wallet = await DirectSecp256k1Wallet.fromKey(
       fromBase64(privateKey),
       prefix
     );
-
+    // wallet.
     return wallet;
   }
 
@@ -353,22 +362,23 @@ export class AuraBase {
     );
     await Promise.all(
       allTokens.map(async (t: { denom: string; amount: string }) => {
-        let token = this.getTokenByAddress(t.denom);
+        const token = this.getTokenByAddress(t.denom);
 
         if (!token && t.denom.startsWith('ibc/')) {
           const ibcHash: string = t.denom.replace('ibc/', '');
 
           // Get base denom by IBC hash
           if (ibcHash) {
-            const { denomTrace } = await setupIbcExtension(
-              await provider.queryClient
-            ).ibc.transfer.denomTrace(ibcHash);
+            console.log('this is ibc denom');
+            // const { denomTrace } = await setupIbcExtension(
+            //   await provider.queryClient
+            // ).ibc.transfer.denomTrace(ibcHash);
 
-            if (denomTrace) {
-              const { baseDenom } = denomTrace;
+            // if (denomTrace) {
+            //   const { baseDenom } = denomTrace;
 
-              token = this.getTokenByAddress(baseDenom);
-            }
+            //   token = this.getTokenByAddress(baseDenom);
+            // }
           }
         }
 
@@ -387,7 +397,6 @@ export class AuraBase {
   async getTransaction(id: string): Promise<IndexedTx> {
     const provider = await this._provider;
     const transaction = await provider.getTx(id);
-
     if (!transaction) {
       throw new Error('Transaction not found');
     }
@@ -408,7 +417,6 @@ export class AuraBase {
 
   async getCurrentBlockNumber(): Promise<number> {
     const provider = await this._provider;
-
     return await provider.getHeight();
   }
 }

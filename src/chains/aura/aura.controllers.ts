@@ -64,14 +64,14 @@ export class AuraController {
 
     const transaction = await cosmos.getTransaction(req.txHash);
     const currentBlock = await cosmos.getCurrentBlockNumber();
-
     return {
       txHash: req.txHash,
       currentBlock,
       txBlock: transaction.height,
-      gasUsed: transaction.gasUsed,
-      gasWanted: transaction.gasWanted,
+      gasUsed: transaction.gasUsed.toString(),
+      gasWanted: transaction.gasWanted.toString(),
       txData: decodeTxRaw(transaction.tx),
+      txStatus: transaction.code,
     };
   }
 }

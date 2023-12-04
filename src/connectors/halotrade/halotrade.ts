@@ -16,6 +16,7 @@ import { toUtf8, toBase64 } from '@cosmjs/encoding';
 import {
   SigningCosmWasmClient,
   MsgExecuteContractEncodeObject,
+  CosmWasmClient,
 } from 'cosmjs-cosmwasm-stargate-0.32';
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 // import { logger } from '../../services/logger';
@@ -120,9 +121,15 @@ export class Halotrade {
     return msg;
   }
 
-  async estimateTrade(req: PriceRequest) {
-    const baseToken = this.tokenList[req.base];
-    const quoteToken = this.tokenList[req.quote];
+  async estimateTrade(req: PriceRequest, reverseSimulate?: boolean) {
+    const baseToken =
+      req.side === 'SELL'
+        ? this.tokenList[req.base]
+        : this.tokenList[req.quote];
+    const quoteToken =
+      req.side === 'SELL'
+        ? this.tokenList[req.quote]
+        : this.tokenList[req.base];
     if (baseToken === null || quoteToken === null)
       throw new HttpException(
         500,
@@ -132,14 +139,27 @@ export class Halotrade {
 
     const msg = this.buildMessage(baseToken, quoteToken);
     // console.log(msg);
-    const cosmwasmClient: SigningCosmWasmClient = await this.aura
-      ._cosmwasmClient;
-    const result = await cosmwasmClient.queryContractSmart(this.router, {
-      simulate_swap_operations: {
-        operations: JSON.parse(msg),
-        offer_amount: req.amount,
-      },
-    });
+    const cosmwasmClient: CosmWasmClient = await this.aura._cosmwasmClient;
+    let result;
+    if (reverseSimulate) {
+      result = await cosmwasmClient.queryContractSmart(this.router, {
+        reverse_simulate_swap_operations: {
+          operations: JSON.parse(msg),
+          ask_amount: (
+            Number(req.amount) * Math.pow(10, baseToken.decimals)
+          ).toString(),
+        },
+      });
+    } else {
+      result = await cosmwasmClient.queryContractSmart(this.router, {
+        simulate_swap_operations: {
+          operations: JSON.parse(msg),
+          offer_amount: (
+            Number(req.amount) * Math.pow(10, baseToken.decimals)
+          ).toString(),
+        },
+      });
+    }
     return result?.amount;
   }
 
@@ -159,10 +179,24 @@ export class Halotrade {
         gasPrice: GasPrice.fromString(this.aura.defaultGasPrice),
       }
     );
+    const baseToken =
+      req.side === 'SELL'
+        ? this.tokenList[req.base]
+        : this.tokenList[req.quote];
+    const quoteToken =
+      req.side === 'SELL'
+        ? this.tokenList[req.quote]
+        : this.tokenList[req.base];
 
-    const estimatedTrade = await this.estimateTrade(req);
-    const baseToken = this.tokenList[req.base];
-    const quoteToken = this.tokenList[req.quote];
+    const estimatedOutputTrade = await this.estimateTrade(req);
+    // let estimateInputTrade;
+    // if (req.side === 'BUY') {
+    //   estimateInputTrade = await this.estimateTrade(req, true);
+    //   req.amount = Math.floor(
+    //     estimateInputTrade / Math.pow(10, baseToken.decimals)
+    //   ).toString();
+    // }
+
     if (baseToken === null || quoteToken === null)
       throw new HttpException(
         500,
@@ -172,7 +206,7 @@ export class Halotrade {
     let msg = {
       execute_swap_operations: {
         operations: JSON.parse(this.buildMessage(baseToken, quoteToken)),
-        minimum_receive: estimatedTrade,
+        minimum_receive: estimatedOutputTrade,
       },
     };
     let contract = '';
@@ -184,7 +218,9 @@ export class Halotrade {
       contract = this.router;
       funds.push({
         denom: baseToken.address,
-        amount: req.amount,
+        amount: (
+          Number(req.amount) * Math.pow(10, quoteToken.decimals)
+        ).toString(),
       });
     } else if (
       baseToken.type === 'cw20' &&
@@ -195,7 +231,9 @@ export class Halotrade {
       msg = JSON.parse(`{
         "send": {
            "contract": "${this.router}",
-           "amount": "${req.amount}",
+           "amount": "${
+             Number(req.amount) * Math.pow(10, quoteToken.decimals)
+           }",
            "msg": "${msgNestedBase64}"
         }
       }`);
@@ -242,8 +280,7 @@ export class Halotrade {
     if (!foundPool) {
       return null;
     }
-    const cosmwasmClient: SigningCosmWasmClient = await this.aura
-      ._cosmwasmClient;
+    const cosmwasmClient: CosmWasmClient = await this.aura._cosmwasmClient;
     const result = await cosmwasmClient.queryContractSmart(foundPool.address, {
       pool: {},
     });
@@ -265,13 +302,10 @@ export class Halotrade {
       }
     });
     const expectedPrice =
-      req.side === 'SELL'
+      req.side === 'BUY'
         ? Number(amountBaseToken) / Number(amountQuoteToken)
         : Number(amountQuoteToken) / Number(amountBaseToken);
-    const expectedAmount =
-      req.side === 'SELL'
-        ? Number(req.amount)
-        : expectedPrice * Number(req.amount);
+    const expectedAmount = expectedPrice * Number(req.amount);
     return { expectedAmount, expectedPrice };
     // return result?.amount;
   }
