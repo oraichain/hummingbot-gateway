@@ -8,7 +8,7 @@ WORKDIR /home/gateway
 COPY . .
 
 # Dockerfile author / maintainer
-LABEL maintainer="Michael Feng <mike@hummingbot.org>"
+LABEL maintainer="aura.network"
 
 # Build arguments
 LABEL branch=${BRANCH}
