@@ -25,7 +25,7 @@ ENV INSTALLATION_TYPE=docker
 RUN mkdir -p /home/gateway/conf /home/gateway/logs /home/gateway/db /home/gateway/certs
 
 # Install dependencies and compile
-RUN npm run install
+RUN npm install
 RUN npm run build
 
 # Expose port 15888 - note that docs port is 8080
