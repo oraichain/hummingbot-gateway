@@ -25,11 +25,11 @@ ENV INSTALLATION_TYPE=docker
 RUN mkdir -p /home/gateway/conf /home/gateway/logs /home/gateway/db /home/gateway/certs
 
 # Install dependencies and compile
-RUN yarn install --frozen-lockfile
-RUN yarn build
+RUN npm run install
+RUN npm run build
 
 # Expose port 15888 - note that docs port is 8080
 EXPOSE 15888
 
 # Set the default command to run when starting the container
-CMD yarn run start
+CMD npm run start
