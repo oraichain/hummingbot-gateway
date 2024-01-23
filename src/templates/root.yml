@@ -119,3 +119,7 @@ configurations:
   $namespace kujira:
     configurationPath: kujira.yml
     schemaPath: kujira-schema.json
+  
+  $namespace oraichain:
+    configurationPath: oraichain.yml
+    schemaPath: oraichain-schema.json
