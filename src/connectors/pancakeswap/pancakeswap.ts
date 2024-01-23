@@ -174,21 +174,56 @@ export class PancakeSwap implements Uniswapish {
     logger.info(
       `Fetching pair data for ${quoteToken.address}-${baseToken.address}.`
     );
+    // console.log(this._u)
+
+    let wbnb = this.getTokenByAddress(
+      '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+    );
+
     const pair: Pair = await Fetcher.fetchPairData(
       quoteToken,
       baseToken,
       this.bsc.provider
     );
-    const trades: Trade[] = Trade.bestTradeExactOut(
+
+    let trades: Trade[] = Trade.bestTradeExactOut(
       [pair],
       quoteToken,
       nativeTokenAmount,
       { maxHops: 1 }
     );
+    if (trades && trades.length > 0) {
+      let priceImpact = Number(trades[0].priceImpact.toFixed());
+      if (priceImpact > 50) {
+        trades = [];
+      }
+    }
+
     if (!trades || trades.length === 0) {
-      throw new UniswapishPriceError(
-        `priceSwapOut: no trade pair found for ${quoteToken.address} to ${baseToken.address}.`
+      const pair1: Pair = await Fetcher.fetchPairData(
+        quoteToken,
+        wbnb,
+        this.bsc.provider
       );
+      const pair2: Pair = await Fetcher.fetchPairData(
+        wbnb,
+        baseToken,
+        this.bsc.provider
+      );
+
+      trades = Trade.bestTradeExactOut(
+        [pair1, pair2],
+        quoteToken,
+        nativeTokenAmount,
+        {
+          maxHops: 2,
+        }
+      );
+      if (!trades || trades.length === 0) {
+        throw new UniswapishPriceError(
+          `priceSwapOut: no trade pair found for ${quoteToken.address} to ${baseToken.address}.`
+        );
+      }
     }
     logger.info(
       `Best trade for ${quoteToken.address}-${baseToken.address}: ` +
@@ -199,6 +234,7 @@ export class PancakeSwap implements Uniswapish {
     const expectedAmount = trades[0].maximumAmountIn(
       this.getAllowedSlippage(allowedSlippage)
     );
+
     return { trade: trades[0], expectedAmount };
   }
 
@@ -227,21 +263,55 @@ export class PancakeSwap implements Uniswapish {
       `Fetching pair data for ${baseToken.address}-${quoteToken.address}.`
     );
 
+    let wbnb = this.getTokenByAddress(
+      '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+    );
+
     const pair: Pair = await Fetcher.fetchPairData(
       baseToken,
       quoteToken,
       this.bsc.provider
     );
-    const trades: Trade[] = Trade.bestTradeExactIn(
+
+    let trades: Trade[] = Trade.bestTradeExactIn(
       [pair],
       nativeTokenAmount,
       quoteToken,
       { maxHops: 1 }
     );
+
+    if (trades && trades.length > 0) {
+      let priceImpact = Number(trades[0].priceImpact.toFixed());
+      if (priceImpact > 50) {
+        trades = [];
+      }
+    }
+
     if (!trades || trades.length === 0) {
-      throw new UniswapishPriceError(
-        `priceSwapIn: no trade pair found for ${baseToken} to ${quoteToken}.`
+      const pair1: Pair = await Fetcher.fetchPairData(
+        quoteToken,
+        wbnb,
+        this.bsc.provider
       );
+      const pair2: Pair = await Fetcher.fetchPairData(
+        wbnb,
+        baseToken,
+        this.bsc.provider
+      );
+
+      trades = Trade.bestTradeExactIn(
+        [pair1, pair2],
+        nativeTokenAmount,
+        quoteToken,
+        {
+          maxHops: 2,
+        }
+      );
+      if (!trades || trades.length === 0) {
+        throw new UniswapishPriceError(
+          `priceSwapIn: no trade pair found for ${baseToken} to ${quoteToken}.`
+        );
+      }
     }
     logger.info(
       `Best trade for ${baseToken.address}-${quoteToken.address}: ` +
