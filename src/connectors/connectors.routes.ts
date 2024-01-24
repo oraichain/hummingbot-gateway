@@ -21,6 +21,7 @@ import { CurveConfig } from './curve/curveswap.config';
 import { PlentyConfig } from './plenty/plenty.config';
 import { XRPLCLOBConfig } from './xrpl/xrpl.clob.config';
 import { KujiraConfig } from './kujira/kujira.config';
+import { OraidexConfig } from './oraidex/oraidex.config';
 
 export namespace ConnectorsRoutes {
   export const router = Router();
@@ -161,6 +162,12 @@ export namespace ConnectorsRoutes {
               accountId:
                 'Enter your kujira account number (input 0 if unsure) >>> ',
             },
+          },
+          {
+            name: 'oraidex',
+            trading_type: OraidexConfig.config.tradingTypes,
+            chain_type: OraidexConfig.config.chainType,
+            available_networks: OraidexConfig.config.availableNetworks,
           },
         ],
       });

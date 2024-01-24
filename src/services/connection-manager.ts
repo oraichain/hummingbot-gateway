@@ -42,6 +42,7 @@ import { Kujira } from '../chains/kujira/kujira';
 import { KujiraCLOB } from '../connectors/kujira/kujira';
 import { PancakeswapLP } from '../connectors/pancakeswap/pancakeswap.lp';
 import { XRPLCLOB } from '../connectors/xrpl/xrpl';
+import { OraidexCLOB } from '../connectors/oraidex/oraidex';
 
 export type ChainUnion =
   | Algorand
@@ -228,6 +229,8 @@ export async function getConnector<T>(
     connector === 'curve'
   ) {
     connectorInstance = Curve.getInstance(chain, network);
+  } else if (chain === 'oraichain' && connector === 'oraidex') {
+    connectorInstance = OraidexCLOB.getInstance(chain, network);
   } else {
     throw new Error('unsupported chain or connector');
   }
