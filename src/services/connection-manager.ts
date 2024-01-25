@@ -43,6 +43,7 @@ import { KujiraCLOB } from '../connectors/kujira/kujira';
 import { PancakeswapLP } from '../connectors/pancakeswap/pancakeswap.lp';
 import { XRPLCLOB } from '../connectors/xrpl/xrpl';
 import { OraidexCLOB } from '../connectors/oraidex/oraidex';
+import { Oraichain } from '../chains/oraichain/oraichain';
 
 export type ChainUnion =
   | Algorand
@@ -52,7 +53,8 @@ export type ChainUnion =
   | Xdcish
   | Tezosish
   | XRPLish
-  | Kujira;
+  | Kujira
+  | Oraichain;
 
 export type Chain<T> = T extends Algorand
   ? Algorand
@@ -70,6 +72,8 @@ export type Chain<T> = T extends Algorand
   ? XRPLish
   : T extends KujiraCLOB
   ? KujiraCLOB
+  : T extends OraidexCLOB
+  ? OraidexCLOB
   : never;
 
 export class UnsupportedChainException extends Error {
@@ -133,6 +137,8 @@ export async function getChainInstance(
     connection = XRPL.getInstance(network);
   } else if (chain === 'kujira') {
     connection = Kujira.getInstance(network);
+  } else if (chain === 'oraichain') {
+    connection = Oraichain.getInstance(network);
   } else {
     connection = undefined;
   }
