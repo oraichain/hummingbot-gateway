@@ -10,6 +10,7 @@ import {
   validateAuraBalanceRequest,
   validateAuraPollRequest,
 } from './aura.validators';
+import { TokensRequest } from '../../network/network.requests';
 
 const { decodeTxRaw } = require('@cosmjs/proto-signing');
 
@@ -73,5 +74,13 @@ export class AuraController {
       txData: decodeTxRaw(transaction.tx),
       txStatus: transaction.code,
     };
+  }
+
+  static async getTokens(aura: Aura, req: TokensRequest) {
+    // const initTime = Date.now();
+    // aura.storedTokenList;
+    console.log(req);
+    const tokens = { tokens: aura.storedTokenList };
+    return tokens;
   }
 }

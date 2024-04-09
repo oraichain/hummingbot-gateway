@@ -187,7 +187,17 @@ export class Halotrade {
       req.side === 'SELL'
         ? this.tokenList[req.quote]
         : this.tokenList[req.base];
-
+    const price = await this.price({
+      chain: req.chain,
+      network: req.network,
+      amount: req.amount,
+      side: req.side,
+      base: req.base,
+      quote: req.quote,
+    });
+    if (req.side === 'BUY' && price?.expectedAmount) {
+      req.amount = (price?.expectedAmount).toString();
+    }
     const estimatedOutputTrade = await this.estimateTrade(req);
     // let estimateInputTrade;
     // if (req.side === 'BUY') {
@@ -219,7 +229,7 @@ export class Halotrade {
       funds.push({
         denom: baseToken.address,
         amount: (
-          Number(req.amount) * Math.pow(10, quoteToken.decimals)
+          Number(req.amount) * Math.pow(10, baseToken.decimals)
         ).toString(),
       });
     } else if (
@@ -231,9 +241,7 @@ export class Halotrade {
       msg = JSON.parse(`{
         "send": {
            "contract": "${this.router}",
-           "amount": "${
-             Number(req.amount) * Math.pow(10, quoteToken.decimals)
-           }",
+           "amount": "${Number(req.amount) * Math.pow(10, baseToken.decimals)}",
            "msg": "${msgNestedBase64}"
         }
       }`);
@@ -301,10 +309,15 @@ export class Halotrade {
         amountQuoteToken = asset.amount;
       }
     });
+    // const expectedPrice =
+    //   req.side === 'BUY'
+    //     ? (Number(amountQuoteToken) / Number(amountBaseToken)) *
+    //       Math.pow(10, baseToken.decimals - quoteToken.decimals)
+    //     : (Number(amountBaseToken) / Number(amountQuoteToken)) *
+    //       Math.pow(10, quoteToken.decimals - baseToken.decimals);
     const expectedPrice =
-      req.side === 'BUY'
-        ? Number(amountBaseToken) / Number(amountQuoteToken)
-        : Number(amountQuoteToken) / Number(amountBaseToken);
+      (Number(amountQuoteToken) / Number(amountBaseToken)) *
+      Math.pow(10, baseToken.decimals - quoteToken.decimals);
     const expectedAmount = expectedPrice * Number(req.amount);
     return { expectedAmount, expectedPrice };
     // return result?.amount;

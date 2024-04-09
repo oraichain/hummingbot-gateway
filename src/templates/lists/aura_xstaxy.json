@@ -31,6 +31,24 @@
       "minCoinDenom": "",
       "address": "aura1fgfnuru6krewgt9zzu7nzercz007928uzrw2t2tl6hl3ec50me2q3ankr2",
       "icon": "https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+    },
+    {
+      "name": "AURA",
+      "type": "native",
+      "decimals": 6,
+      "description": "AURA Token",
+      "coinDenom": "uaura",
+      "minCoinDenom": "",
+      "address": "uaura",
+      "icon": "https://assets.coingecko.com/coins/images/6319/standard/usdc.png"
+    }
+  ],
+  "pools": [
+    {
+      "name": "AURA-USDC",
+      "asset1Address": "uaura",
+      "asset2Address": "aura1fgfnuru6krewgt9zzu7nzercz007928uzrw2t2tl6hl3ec50me2q3ankr2",
+      "address": "aura1urvqe5mw00ws25yqdd4c4hlh8kdyf567mpcml7cdve9w08z0ydcqz2ewn0"
     }
   ]
 }

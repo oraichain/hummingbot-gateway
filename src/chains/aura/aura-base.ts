@@ -356,7 +356,7 @@ export class AuraBase {
           );
           balances[token.coinDenom] = {
             decimals: token.decimals,
-            value: BigNumber.from(parseInt(resultCw20Token.balance, 10)),
+            value: BigNumber.from(resultCw20Token.balance),
           };
         })
     );

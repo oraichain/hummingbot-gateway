@@ -25,13 +25,21 @@ export async function price(
   let trade;
   try {
     trade = await halotrade.price(req);
-    // trade = await halotrade.estimateTrade(req);
-    // trade = await halotrade.trade(
-    //   req,
-    //   'aura1526yed57ss0ldhhx0qz4dgzparthuy6u20g9wy',
-    //   false
+    // estimateTrade = await halotrade.estimateTrade(req);
+    // estimateTrade = await halotrade.trade(
+    //   {
+    //     address: 'aura1kku9k0652a87u8cc058z0f0wl3djk6p5l9kx5u',
+    //     base: req.base,
+    //     quote: req.quote,
+    //     amount: req.amount,
+    //     side: req.side,
+    //     chain: req.chain,
+    //     network: req.network,
+    //   },
+    //   true
     // );
     console.log(trade?.toString());
+    // console.log(estimateTrade?.toString());
   } catch (e) {
     if (e instanceof Error) {
       throw new HttpException(
