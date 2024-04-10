@@ -145,7 +145,7 @@ export class Halotrade {
       result = await cosmwasmClient.queryContractSmart(this.router, {
         reverse_simulate_swap_operations: {
           operations: JSON.parse(msg),
-          ask_amount: (
+          ask_amount: Math.floor(
             Number(req.amount) * Math.pow(10, baseToken.decimals)
           ).toString(),
         },
@@ -154,7 +154,7 @@ export class Halotrade {
       result = await cosmwasmClient.queryContractSmart(this.router, {
         simulate_swap_operations: {
           operations: JSON.parse(msg),
-          offer_amount: (
+          offer_amount: Math.floor(
             Number(req.amount) * Math.pow(10, baseToken.decimals)
           ).toString(),
         },
@@ -222,8 +222,10 @@ export class Halotrade {
     let contract = '';
     const funds = [];
     if (
-      (baseToken.type === 'native' || baseToken.type === 'ibc') &&
-      quoteToken.type === 'cw20'
+      ((baseToken.type === 'native' || baseToken.type === 'ibc') &&
+        quoteToken.type === 'cw20') ||
+      ((baseToken.type === 'native' || baseToken.type === 'ibc') &&
+        (quoteToken.type === 'native' || quoteToken.type === 'ibc'))
     ) {
       contract = this.router;
       funds.push({
@@ -292,7 +294,7 @@ export class Halotrade {
     const result = await cosmwasmClient.queryContractSmart(foundPool.address, {
       pool: {},
     });
-    console.log(result?.asset);
+    console.log(result?.assets);
     let amountBaseToken = '0';
     let amountQuoteToken = '0';
     result?.assets.forEach((asset: any) => {

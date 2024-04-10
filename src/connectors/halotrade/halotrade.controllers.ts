@@ -38,7 +38,7 @@ export async function price(
     //   },
     //   true
     // );
-    console.log(trade?.toString());
+    // console.log(trade?.toString());
     // console.log(estimateTrade?.toString());
   } catch (e) {
     if (e instanceof Error) {
@@ -82,7 +82,7 @@ export async function trade(
   try {
     // trade = await halotrade.estimateTrade(req);
     trade = await halotrade.trade(req, false);
-    console.log(trade);
+    // console.log(trade);
   } catch (e) {
     if (e instanceof Error) {
       throw new HttpException(

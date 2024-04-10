@@ -12,7 +12,7 @@
       "icon": "https://aura-explorer-assets.s3.ap-southeast-1.amazonaws.com/dev-assets/token/White.svg"
     },
     {
-      "name": "Tether USDt",
+      "name": "USDT",
       "type": "ibc",
       "decimals": 6,
       "description": "Tether USDt",
@@ -20,6 +20,7 @@
       "minCoinDenom": "",
       "cosmosDenom": "ibc/A95EBDF88AC1E3FDECAA1D6E250B07C0C86475A3E2BFA2E7DC94A6CDE23DF6D6",
       "channel": "channel-2",
+      "address": "ibc/A95EBDF88AC1E3FDECAA1D6E250B07C0C86475A3E2BFA2E7DC94A6CDE23DF6D6",
       "icon": "https://assets.coingecko.com/coins/images/325/large/Tether.png"
     },
     {
@@ -49,6 +50,12 @@
       "asset1Address": "uaura",
       "asset2Address": "aura1fgfnuru6krewgt9zzu7nzercz007928uzrw2t2tl6hl3ec50me2q3ankr2",
       "address": "aura1urvqe5mw00ws25yqdd4c4hlh8kdyf567mpcml7cdve9w08z0ydcqz2ewn0"
+    },
+    {
+      "name": "AURA-USDT",
+      "asset1Address": "uaura",
+      "asset2Address": "ibc/A95EBDF88AC1E3FDECAA1D6E250B07C0C86475A3E2BFA2E7DC94A6CDE23DF6D6",
+      "address": "aura1nl7tgh7qzh2njwdqshzfxwcvwufpp74gjazhxzeus4zj48s90tpsx0k8jk"
     }
   ]
 }
