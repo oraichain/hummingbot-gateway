@@ -230,7 +230,7 @@ export class Halotrade {
       contract = this.router;
       funds.push({
         denom: baseToken.address,
-        amount: (
+        amount: Math.floor(
           Number(req.amount) * Math.pow(10, baseToken.decimals)
         ).toString(),
       });
@@ -243,7 +243,9 @@ export class Halotrade {
       msg = JSON.parse(`{
         "send": {
            "contract": "${this.router}",
-           "amount": "${Number(req.amount) * Math.pow(10, baseToken.decimals)}",
+           "amount": "${Math.floor(
+             Number(req.amount) * Math.pow(10, baseToken.decimals)
+           )}",
            "msg": "${msgNestedBase64}"
         }
       }`);
