@@ -71,7 +71,11 @@ configurations:
   $namespace cosmos:
     configurationPath: cosmos.yml
     schemaPath: cosmos-schema.json
-
+  
+  $namespace osmosis:
+    configurationPath: osmosis.yml
+    schemaPath: osmosis-schema.json
+    
   $namespace cronos:
     configurationPath: cronos.yml
     schemaPath: ethereum-schema.json
@@ -127,3 +131,11 @@ configurations:
   $namespace oraichain:
     configurationPath: oraichain.yml
     schemaPath: oraichain-schema.json
+    
+  $namespace quipuswap:
+    configurationPath: quipuswap.yml
+    schemaPath: quipuswap-schema.json
+
+  $namespace carbon:
+    configurationPath: carbon.yml
+    schemaPath: carbon-schema.json

@@ -35,6 +35,7 @@ import {
 import { Ethereumish, Tezosish } from '../common-interfaces';
 import { Algorand } from '../../chains/algorand/algorand';
 import { Aura } from '../../chains/aura/aura';
+import { Osmosis } from '../../chains/osmosis/osmosis';
 
 export function convertXdcAddressToEthAddress(publicKey: string): string {
   return publicKey.length === 43 && publicKey.slice(0, 3) === 'xdc'
@@ -120,6 +121,16 @@ export async function addWallet(
       );
       address = wallet.address;
       encryptedPrivateKey = await (connection as Aura).encrypt(
+        req.privateKey,
+        passphrase
+      );
+    } else if (connection instanceof Osmosis) {
+      const wallet = await (connection as Osmosis).getAccountsfromPrivateKey(
+        req.privateKey,
+        'osmo'
+      );
+      address = wallet.address;
+      encryptedPrivateKey = await (connection as Osmosis).encrypt(
         req.privateKey,
         passphrase
       );

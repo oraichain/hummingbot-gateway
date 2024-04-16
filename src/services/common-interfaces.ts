@@ -14,7 +14,7 @@ import {
   providers as XdcProviders,
 } from 'ethers-xdc';
 import { EthereumBase } from '../chains/ethereum/ethereum-base';
-import { CosmosBase } from '../chains/cosmos/cosmos-base';
+import { CosmosAsset, CosmosBase } from '../chains/cosmos/cosmos-base';
 import { Provider } from '@ethersproject/abstract-provider';
 import { CurrencyAmount, Token, Trade as TradeUniswap } from '@uniswap/sdk';
 import { Trade } from '@uniswap/router-sdk';
@@ -81,9 +81,13 @@ import {
 import {
   Token as PancakeSwapToken,
   CurrencyAmount as PancakeSwapCurrencyAmount,
+  TradeType as PancakeSwapTradeType,
   Trade as PancakeSwapTrade,
   Fraction as PancakeSwapFraction,
+  Currency as PancakeSwapCurrency,
+  Price as PancakeSwapPrice,
 } from '@pancakeswap/sdk';
+import { SmartRouterTrade as PancakeSwapSmartRouterTrade } from '@pancakeswap/smart-router';
 import {
   Token as TokenXsswap,
   CurrencyAmount as CurrencyAmountXsswap,
@@ -111,6 +115,8 @@ import { TradeV2 } from '@traderjoe-xyz/sdk-v2';
 import { AuraToken } from '../chains/aura/aura-token';
 import { AuraBase } from '../chains/aura/aura-base';
 import { CurveTrade } from '../connectors/curve/curve';
+import { SerializableExtendedPool as CosmosSerializableExtendedPool } from '../chains/osmosis/osmosis.types';
+import { CarbonTrade } from '../connectors/carbon/carbonAMM';
 
 // TODO Check the possibility to have clob/solana/serum equivalents here
 //  Check this link https://hummingbot.org/developers/gateway/building-gateway-connectors/#5-add-sdk-classes-to-uniswapish-interface
@@ -126,6 +132,7 @@ export type Tokenish =
   | MMFToken
   | VVSToken
   | TokenXsswap
+  | CosmosAsset
   | AuraToken;
 
 export type TokenAmountish = MMFTokenAmount | VVSTokenAmount;
@@ -144,12 +151,23 @@ export type UniswapishTrade =
   | TradeTraderjoe
   | SushiswapTrade<SushiToken, SushiToken, SushiTradeType>
   | TradeUniswap
-  | PancakeSwapTrade
+  | PancakeSwapTrade<
+      PancakeSwapCurrency,
+      PancakeSwapCurrency,
+      PancakeSwapTradeType
+    >
+  | (PancakeSwapSmartRouterTrade<PancakeSwapTradeType> & {
+      executionPrice: PancakeSwapPrice<
+        PancakeSwapCurrency,
+        PancakeSwapCurrency
+      >;
+    })
   | MMFTrade
   | VVSTrade
   | TradeXsswap
   | TradeV2
-  | CurveTrade;
+  | CurveTrade
+  | CarbonTrade;
 
 export type UniswapishTradeOptions =
   | MMFTradeOptions
@@ -166,7 +184,7 @@ export type UniswapishAmount =
   | UniswapCoreCurrencyAmount<Currency>
   | CurrencyAmountTraderjoe
   | SushiCurrencyAmount<SushiCurrency | SushiToken>
-  | PancakeSwapCurrencyAmount
+  | PancakeSwapCurrencyAmount<PancakeSwapCurrency>
   | CurrencyAmountMMF
   | CurrencyAmountVVS
   | CurrencyAmountXsswap
@@ -189,15 +207,17 @@ export interface ExpectedTrade {
 }
 
 export interface PositionInfo {
-  token0: string | undefined;
-  token1: string | undefined;
-  fee: string | undefined;
-  lowerPrice: string;
-  upperPrice: string;
-  amount0: string;
-  amount1: string;
-  unclaimedToken0: string;
-  unclaimedToken1: string;
+  token0?: string | undefined;
+  token1?: string | undefined;
+  poolShares?: string; // COSMOS - GAMM pools only issue poolShares (no amount/unclaimedToken)
+  fee?: string | undefined;
+  lowerPrice?: string;
+  upperPrice?: string;
+  amount0?: string; // COSMOS - CL pools only
+  amount1?: string; // COSMOS - CL pools only
+  unclaimedToken0?: string; // COSMOS - CL pools only
+  unclaimedToken1?: string; // COSMOS - CL pools only
+  pools?: CosmosSerializableExtendedPool[];
 }
 
 export interface Uniswapish {
@@ -887,4 +907,16 @@ export interface TransferRequest extends NetworkSelectionRequest {
   token: string;
 }
 
-export type TransferResponse = string;
+export type TransferResponse = string | FullTransferResponse;
+
+export interface FullTransferResponse {
+  network: string;
+  timestamp: number;
+  latency: number;
+  amount: string;
+  gasPrice: string;
+  gasLimit: string;
+  gasUsed: string;
+  gasWanted: string;
+  txHash: string;
+}

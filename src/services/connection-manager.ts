@@ -6,6 +6,7 @@ import { Harmony } from '../chains/harmony/harmony';
 import { Polygon } from '../chains/polygon/polygon';
 import { Xdc } from '../chains/xdc/xdc';
 import { Tezos } from '../chains/tezos/tezos';
+import { Osmosis } from '../chains/osmosis/osmosis';
 import { XRPL, XRPLish } from '../chains/xrpl/xrpl';
 import { MadMeerkat } from '../connectors/mad_meerkat/mad_meerkat';
 import { Openocean } from '../connectors/openocean/openocean';
@@ -44,6 +45,8 @@ import { Aura } from '../chains/aura/aura';
 import { Halotrade } from '../connectors/halotrade/halotrade';
 import { PancakeswapLP } from '../connectors/pancakeswap/pancakeswap.lp';
 import { XRPLCLOB } from '../connectors/xrpl/xrpl';
+import { QuipuSwap } from '../connectors/quipuswap/quipuswap';
+import { Carbonamm } from '../connectors/carbon/carbonAMM';
 
 export type ChainUnion =
   | Algorand
@@ -52,9 +55,10 @@ export type ChainUnion =
   | Nearish
   | Xdcish
   | Tezosish
+  | XRPLish
   | Kujira
-  | Aura
-  | XRPLish;
+  | Osmosis
+  | Aura;
 
 export type Chain<T> = T extends Algorand
   ? Algorand
@@ -72,6 +76,10 @@ export type Chain<T> = T extends Algorand
   ? XRPLish
   : T extends KujiraCLOB
   ? KujiraCLOB
+  : T extends Osmosis
+  ? Osmosis
+  : T extends Aura
+  ? Aura
   : never;
 
 export class UnsupportedChainException extends Error {
@@ -125,6 +133,8 @@ export async function getChainInstance(
     connection = Cosmos.getInstance(network);
   } else if (chain === 'aura') {
     connection = Aura.getInstance(network);
+  } else if (chain === 'osmosis') {
+    connection = Osmosis.getInstance(network);
   } else if (chain === 'near') {
     connection = Near.getInstance(network);
   } else if (chain === 'binance-smart-chain') {
@@ -155,7 +165,8 @@ export type ConnectorUnion =
   | KujiraCLOB
   | Halotrade
   | XRPLCLOB
-  | Curve;
+  | Curve
+  | QuipuSwap;
 
 export type Connector<T> = T extends Uniswapish
   ? Uniswapish
@@ -177,6 +188,8 @@ export type Connector<T> = T extends Uniswapish
   ? KujiraCLOB
   : T extends Halotrade
   ? Halotrade
+  : T extends QuipuSwap
+  ? QuipuSwap
   : never;
 
 export async function getConnector<T>(
@@ -238,6 +251,10 @@ export async function getConnector<T>(
     connector === 'curve'
   ) {
     connectorInstance = Curve.getInstance(chain, network);
+  } else if (chain === 'tezos' && connector === 'quipuswap') {
+    connectorInstance = QuipuSwap.getInstance(network);
+  } else if (chain === 'ethereum' && connector === 'carbonamm') {
+    connectorInstance = Carbonamm.getInstance(chain, network);
   } else {
     throw new Error('unsupported chain or connector');
   }
