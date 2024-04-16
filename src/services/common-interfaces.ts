@@ -78,7 +78,6 @@ import {
   TradeOptionsDeadline as VVSTradeOptionsDeadline,
   SwapParameters as VVSSwapParameters,
 } from 'vvs-sdk';
-import { Trade as DefiraTrade } from '@zuzu-cat/defira-sdk';
 import {
   Token as PancakeSwapToken,
   CurrencyAmount as PancakeSwapCurrencyAmount,
@@ -111,6 +110,7 @@ import { BalanceRequest } from '../network/network.requests';
 import { TradeV2 } from '@traderjoe-xyz/sdk-v2';
 import { AuraToken } from '../chains/aura/aura-token';
 import { AuraBase } from '../chains/aura/aura-base';
+import { CurveTrade } from '../connectors/curve/curve';
 
 // TODO Check the possibility to have clob/solana/serum equivalents here
 //  Check this link https://hummingbot.org/developers/gateway/building-gateway-connectors/#5-add-sdk-classes-to-uniswapish-interface
@@ -144,12 +144,12 @@ export type UniswapishTrade =
   | TradeTraderjoe
   | SushiswapTrade<SushiToken, SushiToken, SushiTradeType>
   | TradeUniswap
-  | DefiraTrade<UniswapCoreToken, UniswapCoreToken, TradeType>
   | PancakeSwapTrade
   | MMFTrade
   | VVSTrade
   | TradeXsswap
-  | TradeV2;
+  | TradeV2
+  | CurveTrade;
 
 export type UniswapishTradeOptions =
   | MMFTradeOptions
@@ -169,7 +169,8 @@ export type UniswapishAmount =
   | PancakeSwapCurrencyAmount
   | CurrencyAmountMMF
   | CurrencyAmountVVS
-  | CurrencyAmountXsswap;
+  | CurrencyAmountXsswap
+  | UniswapFraction;
 
 export type Fractionish =
   | UniswapFraction
@@ -579,7 +580,7 @@ export interface UniswapLPish {
     token1: UniswapCoreToken,
     amount0: string,
     amount1: string,
-    fee: number,
+    fee: string,
     lowerPrice: number,
     upperPrice: number,
     tokenId: number,
@@ -645,7 +646,7 @@ export interface UniswapLPish {
   poolPrice(
     token0: UniswapCoreToken,
     token1: UniswapCoreToken,
-    fee: number,
+    fee: string,
     period: number,
     interval: number
   ): Promise<string[]>;
@@ -878,3 +879,12 @@ export interface CustomTransactionResponse
   gasLimit: string;
   value: string;
 }
+
+export interface TransferRequest extends NetworkSelectionRequest {
+  to: string;
+  from: string;
+  amount: string;
+  token: string;
+}
+
+export type TransferResponse = string;
